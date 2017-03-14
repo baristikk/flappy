@@ -5,20 +5,24 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
     public float ForcaDoPulo = 10f;
-
+    public AudioClip somPulo;
+    public AudioClip somMorte;
     private Animator anim;
     private Rigidbody rb;
+    private AudioSource audioSource;
     private bool pulando = false;
 
 	void Start () {
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
         if (Input.GetMouseButtonDown(0)) {
             anim.Play("pulando");
+            audioSource.PlayOneShot(somPulo);
             rb.useGravity = true;
             pulando = true;
         }
@@ -41,6 +45,7 @@ public class PlayerController : MonoBehaviour {
             rb.AddForce(new Vector3(-50f, 20f, 0), ForceMode.Impulse);
             rb.detectCollisions = false;
             anim.Play("morrendo");
+            audioSource.PlayOneShot(somMorte);
         }
 
     }
