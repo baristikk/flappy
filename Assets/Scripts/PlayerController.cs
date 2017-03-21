@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
+
+
     public float ForcaDoPulo = 10f;
     public AudioClip somPulo;
     public AudioClip somMorte;
@@ -20,33 +22,49 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetMouseButtonDown(0)) {
-            anim.Play("pulando");
-            audioSource.PlayOneShot(somPulo);
-            rb.useGravity = true;
-            pulando = true;
+        if (GameController.instancia.estado == Estado.Jogando || GameController.instancia.estado == Estado.AguardoComecar) {
+            if (Input.GetMouseButtonDown(0))
+            {
+                anim.Play("pulando");
+                audioSource.PlayOneShot(somPulo);
+                rb.useGravity = true;
+                pulando = true;
+                if (GameController.instancia.estado == Estado.AguardoComecar)
+                {
+                    GameController.instancia.PlayerComecou();
+                }
+            }
         }
 		
 	}
 
     void FixedUpdate() {
 
-        if (pulando) {
-            pulando = false;
-            rb.velocity = Vector3.zero;
-            rb.AddForce(Vector3.up * ForcaDoPulo, ForceMode.Impulse);
+        if (GameController.instancia.estado == Estado.Jogando)
+        {
+            if (pulando)
+            {
+                pulando = false;
+                rb.velocity = Vector3.zero;
+                rb.AddForce(Vector3.up * ForcaDoPulo, ForceMode.Impulse);
 
+            }
         }
          
     }
-   void OnCollisionEnter(Collision outro) {
+    void OnCollisionEnter(Collision outro)
+    {
+        if (GameController.instancia.estado == Estado.Jogando)
+        {
+            if (outro.gameObject.tag == "obstaculo")
+            {
+                rb.AddForce(new Vector3(-50f, 20f, 0), ForceMode.Impulse);
+                rb.detectCollisions = false;
+                anim.Play("morrendo");
+                audioSource.PlayOneShot(somMorte);
+                GameController.instancia.PlayerMorreu();
+            }
 
-        if (outro.gameObject.tag == "obstaculo") {
-            rb.AddForce(new Vector3(-50f, 20f, 0), ForceMode.Impulse);
-            rb.detectCollisions = false;
-            anim.Play("morrendo");
-            audioSource.PlayOneShot(somMorte);
         }
-
     }
 }
